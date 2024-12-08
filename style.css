@@ -1,0 +1,12 @@
+.empty{
+	color: red;
+	font: 600;
+	font-weight: 500;
+	font-display: initial;
+	font-style: oblique;
+	font-variant: small-caps;
+	text-decoration: dotted;
+	text-align: center;
+	text-transform: uppercase;
+	text-decoration-color: red;
+}
