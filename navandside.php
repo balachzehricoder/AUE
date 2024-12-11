@@ -1,101 +1,111 @@
+<?php
+session_start();
+include "admin/confiq.php";
+
+// Example session check for a logged-in user
+$isLoggedIn = isset($_SESSION['user_id']); // Check if a user session exists
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Phonesell</title>
-
-    <!-- Include TailwindCSS -->
+    <title>AUE</title>
     <script src="https://cdn.tailwindcss.com"></script>
-
-    <!-- Fav and touch icons -->
-    <link rel="shortcut icon" href="themes/images/ico/favicon.ico">
-    <link rel="stylesheet" href="includes/style.css">
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
-            integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
-            crossorigin="anonymous"></script>
+    <link rel="icon" href="assets/logo.jpg">
 </head>
-<body class="bg-gray-100">
-
-<?php
-include 'admin/confiq.php';
-include 'funcation.php';
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-
-// Function to get wishlist item count for a specific user
-function getWishlistItemCountForUser($user_id)
-{
-    include 'admin/confiq.php';
-
-    if ($conn->connect_error) {
-        die("Connection failed: " . $conn->connect_error);
-    }
-
-    $sql = "SELECT COUNT(*) AS wishlist_count FROM wishlist WHERE user_id = ?";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("i", $user_id);
-    $stmt->execute();
-    $result = $stmt->get_result();
-
-    $wishlistCount = ($result->num_rows > 0) ? $result->fetch_assoc()['wishlist_count'] : 0;
-
-    $stmt->close();
-    $conn->close();
-    return $wishlistCount;
-}
-
-// Check if user is logged in
-if (!isset($_SESSION["user_id"])) {
-    exit("You need to log in to view this page.");
-}
-
-$user_id = $_SESSION["user_id"];
-$wishlistCount = getWishlistItemCountForUser($user_id);
-$cartCount = isset($_SESSION['cart_details']['cart_total_qty']) ? $_SESSION['cart_details']['cart_total_qty'] : 0;
-?>
-
-<section class="bg-indigo-600 text-white py-4">
-    <div class="container mx-auto flex justify-between items-center flex-wrap">
-        <div class="text-sm w-full sm:w-auto">
-            <p>Free shipping, 30-day return or refund guarantee.</p>
-        </div>
-        <div class="flex gap-4 w-full sm:w-auto mt-2 sm:mt-0 justify-center sm:justify-end">
-            <a href="userpanel/pages/dashboard.html" class="hover:text-indigo-200">User Dashboard</a>
-            <a href="wishlistview.php" class="hover:text-indigo-200">Wishlist (<?php echo $wishlistCount; ?>)</a>
-            <a href="cart.php" class="hover:text-indigo-200">Cart (<?php echo $cartCount; ?>)</a>
-            <a href="logout.php" class="hover:text-indigo-200">Logout</a>
-        </div>
-    </div>
-</section>
-
-<nav class="bg-white shadow-md">
-    <div class="container mx-auto flex justify-between items-center p-4 flex-wrap">
-        <div class="text-2xl font-semibold text-indigo-600">
+<body>
+<nav class="bg-white text-black-50 sticky top-0 z-50 shadow-md">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between items-center py-4">
             <!-- Logo -->
-            <img src="assets/logo.jpg" height="80px" width="80px">
-        </div>
-        <ul class="flex gap-6 text-lg text-gray-800 w-full sm:w-auto justify-center sm:justify-start mt-4 sm:mt-0">
-            <li><a href="index.php" class="hover:text-indigo-600">Home</a></li>
-            <li><a href="shop.php" class="hover:text-indigo-600">Shop</a></li>
-            <li><a href="about.php" class="hover:text-indigo-600">About</a></li>
-            <li><a href="contact.php" class="hover:text-indigo-600">Contact</a></li>
-        </ul>
-        <div class="flex gap-4 items-center w-full sm:w-auto justify-center sm:justify-end mt-4 sm:mt-0">
-            <form action="search.php" method="GET" class="flex w-full sm:w-auto">
-                <input type="text" name="query" placeholder="Search products..."
-                       class="p-2 border border-gray-300 rounded-l-md w-full sm:w-64">
-                <button type="submit"
-                        class="p-2 bg-indigo-600 text-white rounded-r-md hover:bg-indigo-700 w-full sm:w-auto">Search
+            <a href="index.php">
+                <img src="assets/logo.jpg" alt="Logo" class="h-12">
+            </a>
+
+            <!-- Search Bar for All Devices -->
+            <div class="flex items-center w-1/2">
+                <form action="search.php" method="GET" class="w-full flex items-center">
+                    <div class="relative w-full">
+                        <input
+                                type="text"
+                                name="query"
+                                class="w-full py-2 px-4 pl-10 text-gray-700 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                placeholder="Search products..."
+                        />
+                        <svg xmlns="http://www.w3.org/2000/svg" class="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 18a7 7 0 100-14 7 7 0 000 14zm0 0l6 6" />
+                        </svg>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Nav Links (Desktop) -->
+            <div class="hidden md:flex space-x-6">
+                <a href="#" class="hover:text-gray-700">Home</a>
+                <a href="#" class="hover:text-gray-700">Shop</a>
+                <a href="#" class="hover:text-gray-700">Category</a>
+                <a href="#" class="hover:text-gray-700">Contact Us</a>
+            </div>
+
+            <!-- Auth/User Links -->
+            <div class="hidden md:flex items-center space-x-6">
+                <?php if ($isLoggedIn): ?>
+                    <!-- User is logged in -->
+                    <a href="userpanel/pages/dashboard.html" class="hover:text-gray-700">Profile</a>
+                    <a href="wishlistview.php" class="hover:text-gray-700">Wishlist</a>
+                    <a href="cart.php" class="hover:text-gray-700">Cart</a>
+                    <a href="logout.php" class="hover:text-gray-700">Logout</a>
+                <?php else: ?>
+                    <!-- User is not logged in -->
+                    <a href="login.php" class="hover:text-gray-700">Sign In</a>
+                    <a href="register.php" class="hover:text-gray-700">Sign Up</a>
+                    <a href="wishlistview.php" class="hover:text-gray-700">Wishlist</a>
+                    <a href="cart.php" class="hover:text-gray-700">Cart</a>
+                <?php endif; ?>
+            </div>
+
+            <!-- Burger Menu (Mobile) -->
+            <div class="flex md:hidden">
+                <button id="menu-button" class="text-black focus:outline-none">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
                 </button>
-            </form>
+            </div>
+        </div>
+
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden">
+            <a href="#" class="block py-2 px-4 text-sm hover:bg-gray-300">Home</a>
+            <a href="#" class="block py-2 px-4 text-sm hover:bg-gray-300">Shop</a>
+            <a href="#" class="block py-2 px-4 text-sm hover:bg-gray-300">Category</a>
+            <a href="#" class="block py-2 px-4 text-sm hover:bg-gray-300">Contact Us</a>
+            <?php if ($isLoggedIn): ?>
+                <!-- User is logged in -->
+                <a href="userpanel/pages/dashboard.html" class="block py-2 px-4 text-sm hover:bg-gray-300">Profile</a>
+                <a href="wishlist.php" class="block py-2 px-4 text-sm hover:bg-gray-300">Wishlist</a>
+                <a href="cart.php" class="block py-2 px-4 text-sm hover:bg-gray-300">Cart</a>
+                <a href="logout.php" class="block py-2 px-4 text-sm hover:bg-gray-300">Logout</a>
+            <?php else: ?>
+                <!-- User is not logged in -->
+                <a href="login.php" class="block py-2 px-4 text-sm hover:bg-gray-300">Sign In</a>
+                <a href="register.php" class="block py-2 px-4 text-sm hover:bg-gray-300">Sign Up</a>
+                <a href="wishlist.php" class="block py-2 px-4 text-sm hover:bg-gray-300">Wishlist</a>
+                <a href="cart.php" class="block py-2 px-4 text-sm hover:bg-gray-300">Cart</a>
+            <?php endif; ?>
         </div>
     </div>
 </nav>
 
-<script src="includes/script.js"></script>
+<script>
+    // Toggle mobile menu
+    const menuButton = document.getElementById("menu-button");
+    const mobileMenu = document.getElementById("mobile-menu");
+
+    menuButton.addEventListener("click", () => {
+        mobileMenu.classList.toggle("hidden");
+    });
+</script>
 </body>
 </html>

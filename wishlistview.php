@@ -1,13 +1,9 @@
 <?php
- include 'navandside.php' ;
-
-
-
-
+include 'navandside.php';
 
 function getWishlistItemsForUserview($user_id) {
     include 'admin/confiq.php';
-    
+
     if ($conn->connect_error) {
         die("Connection failed: " . $conn->connect_error);
     }
@@ -35,7 +31,6 @@ function getWishlistItemsForUserview($user_id) {
 }
 
 // The Session Use
-
 include 'includes/config.php';
 $id = $_SESSION["user_id"];
 $query = "SELECT * FROM users where id='$id'";
@@ -51,89 +46,57 @@ $wishlistItems = getWishlistItemsForUserview($user_id);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Wishlist</title>
-    <meta name="author" content="">
-    <!--Less styles -->
-    <!-- Other Less css file //different less files have different color scheme
-    <link rel="stylesheet/less" type="text/css" href="themes/less/simplex.less">
-    <link rel="stylesheet/less" type="text/css" href="themes/less/classified.less">
-    <link rel="stylesheet/less" type="text/css" href="themes/less/amelia.less">  MOVE DOWN TO activate
-    -->
-    <!--<link rel="stylesheet/less" type="text/css" href="themes/less/bootshop.less">
-    <script src="themes/js/less.js" type="text/javascript"></script> -->
 
-    <!-- Bootstrap style -->
-    <link id="callCss" rel="stylesheet" href="themes/bootshop/bootstrap.min.css" media="screen"/>
-    <link href="themes/css/base.css" rel="stylesheet" media="screen"/>
-    <!-- Bootstrap style responsive -->
-    <link href="themes/css/bootstrap-responsive.min.css" rel="stylesheet"/>
-    <link href="themes/css/font-awesome.css" rel="stylesheet" type="text/css">
-    <!-- Google-code-prettify -->
-    <link href="themes/js/google-code-prettify/prettify.css" rel="stylesheet"/>
-    <!-- fav and touch icons -->
-    <link rel="shortcut icon" href="themes/images/ico/favicon.ico">
-    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="themes/images/ico/apple-touch-icon-144-precomposed.png">
-    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="themes/images/ico/apple-touch-icon-114-precomposed.png">
-    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="themes/images/ico/apple-touch-icon-72-precomposed.png">
-    <link rel="apple-touch-icon-precomposed" href="themes/images/ico/apple-touch-icon-57-precomposed.png">
-    <style type="text/css" id="enject"></style>
-    <link rel="icon" href="logo.png">
-
+    <!-- TailwindCSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<style>
-    .empty {
-        color: red;
-        font: 600;
-        font-weight: 500;
-        font-display: initial;
-        font-style: oblique;
-        font-variant: small-caps;
-        text-decoration: dotted;
-        text-align: center;
-        text-transform: uppercase;
-        text-decoration-color: red;
-    }
-</style>
-<body>
-<div class="span9">
-    <table class="table table-bordered">
-        <thead>
-        <tr>
-            <th>Product</th>
-            <th>Description</th>
-            <th>Price</th>
-            <th>Action</th>
-        </tr>
-        </thead>
-        <tbody>
-        <?php
-        foreach ($wishlistItems as $item) {
-            ?>
+<body class="bg-gray-100">
+
+<div class="container mx-auto my-8">
+    <h1 class="text-3xl font-semibold text-center mb-6">Your Wishlist</h1>
+    <div class="overflow-x-auto bg-white rounded-lg shadow-md">
+        <table class="min-w-full text-left text-sm text-gray-600">
+            <thead class="bg-indigo-600 text-white">
             <tr>
-                <td> <img width="60" src="admin/<?php echo $item['img_upload']; ?>" alt=""/></td>
-                <td><?php echo $item['p_name']; ?><br/>Color : black, Material : metal</td>
-                <td>Rp<?php echo number_format($item['p_price']); ?></td>
-                <td>
-                    <a href="delete-wishlist-item.php?id=<?php echo $item['wishlist_id']; ?>" class="btn btn-danger" role="button">
-                        <i class="icon-remove icon-white"></i> Remove
-
-
-                        
-
-                    </a>
-
-
-                    <a href="add-to-cart.php?id=<?php echo $item['wishlist_id']; ?>" class="btn btn-sucess" role="button">
-                        <i class="icon-cart icon-white"></i> add to cart
-
-                        
-                        
-
-                    </a>
-                </td>
+                <th class="p-3">Product</th>
+                <th class="p-3">Description</th>
+                <th class="p-3">Price</th>
+                <th class="p-3">Action</th>
             </tr>
-        <?php } ?>
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+            <?php if (count($wishlistItems) > 0): ?>
+                <?php foreach ($wishlistItems as $item): ?>
+                    <tr class="border-t">
+                        <td class="p-3">
+                            <img src="admin/<?php echo $item['img_upload']; ?>" alt="Product Image" class="w-16 h-16 object-cover rounded-md">
+                        </td>
+                        <td class="p-3">
+                            <div class="font-medium"><?php echo $item['p_name']; ?></div>
+                            <div class="text-xs text-gray-500">Color: black, Material: metal</div>
+                        </td>
+                        <td class="p-3">Rp<?php echo number_format($item['p_price']); ?></td>
+                        <td class="p-3">
+                            <a href="delete-wishlist-item.php?id=<?php echo $item['wishlist_id']; ?>" class="text-red-600 hover:text-red-800">
+                                <i class="fas fa-trash"></i> Remove
+                            </a>
+                            <br>
+                            <a href="add-to-cart.php?id=<?php echo $item['wishlist_id']; ?>" class="text-green-600 hover:text-green-800 mt-2 inline-block">
+                                <i class="fas fa-cart-plus"></i> Add to Cart
+                            </a>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+            <?php else: ?>
+                <tr>
+                    <td colspan="4" class="p-3 text-center text-red-500">Your wishlist is empty</td>
+                </tr>
+            <?php endif; ?>
+            </tbody>
+        </table>
+    </div>
 </div>
+
+<script src="https://kit.fontawesome.com/a076d05399.js"></script>
 </body>
 </html>

@@ -1,77 +1,66 @@
 <?php
+session_start();
+include './admin/confiq.php'; // Include your database connection
 
-include './admin/confiq.php';
-$id = $_SESSION["user_id"];
-$query = "SELECT * FROM users where id='$id'";
-$result = $conn->query($query);
-if ($result->num_rows > 0) {
-    while ($row = $result->fetch_assoc()) {
-        $full_name = $row['full_name'];
-        $email = $row['email'];
-        $phone = $row['phone'];
-        $address = $row['address'];
-    }
+// Ensure user is logged in
+if (!isset($_SESSION["user_id"])) {
+    die("User not logged in");
 }
 
+// Get user details
+$id = $_SESSION["user_id"];
+$stmt = $conn->prepare("SELECT * FROM users WHERE id = ?");
+$stmt->bind_param("i", $id);
+$stmt->execute();
+$result = $stmt->get_result();
+if ($result->num_rows > 0) {
+    $row = $result->fetch_assoc();
+    $full_name = $row['first_name'];
+    $email = $row['email'];
+    $phone = $row['mobile_number'];
+    $address = $row['address'];
+} else {
+    die("User not found");
+}
 
-/* 
-	https://github.com/PHPMailer/PHPMailer
-
-	Download PHPMailer, open the zip file and extract the folder to your project directory.
-
-	Rename the extracted directory to PHPMailer and write the below code inside of your php script (the script must be outside of the PHPMailer folder)
-*/
-
-
-// PHPMailer classes into the global namespace
-use PHPMailer\PHPMailer\PHPMailer; 
+use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
-// Base files 
+
+// Base files
 require 'PHPMailer/src/Exception.php';
 require 'PHPMailer/src/PHPMailer.php';
 require 'PHPMailer/src/SMTP.php';
-// create object of PHPMailer class with boolean parameter which sets/unsets exception.
-$mail = new PHPMailer(true);                              
+
+// Create PHPMailer instance
+$mail = new PHPMailer(true);
+
 try {
-    $mail->isSMTP(); // using SMTP protocol                                     
-    $mail->Host = 'smtp.gmail.com'; // SMTP host as gmail 
-    $mail->SMTPAuth = true;  // enable smtp authentication                             
-    $mail->Username = 'phonesell7896@gmail.com';  // sender gmail host              
-    $mail->Password = 'wpeolucbkvtfmljy'; // sender gmail host password                          
-    $mail->SMTPSecure = 'tls';  // for encrypted connection                           
-    $mail->Port = 587;   // port for SMTP     
+    // Email to user
+    $mail->isSMTP();
+    $mail->Host = 'smtp.gmail.com';
+    $mail->SMTPAuth = true;
+    $mail->Username = 'phonesell7896@gmail.com'; // Sender email
+    $mail->Password = 'wpeolucbkvtfmljy'; // Sender email password
+    $mail->SMTPSecure = 'tls';
+    $mail->Port = 587;
 
-    $mail->setFrom('phonesell7896@gmail.com', "phonesell.com"); // sender's email and name
-    $mail->addAddress($email, "phonesell.com");  // receiver's email and name
-
-    $mail->Subject = 'your conformation';
-    $mail->Body    = 'your order has been placed';
-
+    $mail->setFrom('phonesell7896@gmail.com', "phonesell.com");
+    $mail->addAddress($email, $full_name); // User's email
+    $mail->Subject = 'Your Order Confirmation';
+    $mail->Body = 'Hello ' . $full_name . ', your order has been placed successfully!';
+    $mail->isHTML(true); // Set email format to HTML
     $mail->send();
-    echo 'Message has been sent';
-} catch (Exception $e) { // handle error.
+
+    // Email to admin
+    $mail->clearAddresses(); // Clear previous recipients
+    $mail->addAddress("balachzehr@hotmail.com", "Admin"); // Admin email
+    $mail->Subject = 'New Order Notification';
+    $mail->Body = 'A new order has been placed by ' . $full_name . '. Please check it out.';
+    $mail->send();
+
+    echo 'Order confirmation and notification emails have been sent.';
+} catch (Exception $e) {
     echo 'Message could not be sent. Mailer Error: ', $mail->ErrorInfo;
 }
 
-
-try {
-    $mail->isSMTP(); // using SMTP protocol                                     
-    $mail->Host = 'smtp.gmail.com'; // SMTP host as gmail 
-    $mail->SMTPAuth = true;  // enable smtp authentication                             
-    $mail->Username = 'phonesell7896@gmail.com';  // sender gmail host              
-    $mail->Password = 'wpeolucbkvtfmljy'; // sender gmail host password                          
-    $mail->SMTPSecure = 'tls';  // for encrypted connection                           
-    $mail->Port = 587;   // port for SMTP     
-
-    $mail->setFrom('phonesell7896@gmail.com', "phonesell.com"); // sender's email and name
-    $mail->addAddress("balachzehr@hotmail.com", "phonesell.com");  // receiver's email and name
-
-    $mail->Subject = 'NEW ORDER';
-    $mail->Body    = 'may you have new order pls check it out';
-
-    $mail->send();
-    echo 'Message has been sent';
-} catch (Exception $e) { // handle error.
-    echo 'Message could not be sent. Mailer Error: ', $mail->ErrorInfo;
-}
 ?>

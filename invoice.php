@@ -2,27 +2,44 @@
 session_start();
 include 'admin/confiq.php';
 
-$id = $_SESSION["user_id"];
-$query = "SELECT * FROM users where id='$id' ";
-$result = $conn->query($query);
-if ($result->num_rows > 0) {
-    foreach ($result as $row) {
+// Get the order_id from the URL
+$order_id = $_GET['order_id'];
+
+// Check if the user is logged in
+$full_name = $email = $phone = $address = '';
+
+// Check if user is logged in
+if (isset($_SESSION["user_id"])) {
+    $id = $_SESSION["user_id"];
+    $query = "SELECT * FROM users WHERE id='$id'";
+    $result = $conn->query($query);
+    if ($result->num_rows > 0) {
+        $row = $result->fetch_assoc();
         $full_name = $row['full_name'];
         $email = $row['email'];
         $phone = $row['phone'];
         $address = $row['address'];
     }
+} else {
+    // If user is not logged in, fetch user info from the orders table
+    $query = "SELECT customer_name, customer_email, customer_phone, customer_address FROM orders WHERE id='$order_id'";
+    $result = $conn->query($query);
+    if ($result->num_rows > 0) {
+        $row = $result->fetch_assoc();
+        $full_name = $row['customer_name'];
+        $email = $row['customer_email'];
+        $phone = $row['customer_phone'];
+        $address = $row['customer_address'];
+    }
 }
-
-$order_id = $_GET['order_id'];
 
 // Retrieve order details from the database
 $query = "SELECT * FROM orders WHERE id = '$order_id'";
 $orders = $conn->query($query);
 $orders = mysqli_fetch_assoc($orders);
 
-// Retrieve order details from the database
-$query = "SELECT od.*, p_name FROM order_details od JOIN products p ON od.product_id = p.id WHERE od.order_id = '$order_id'";
+// Retrieve order products from the database
+$query = "SELECT od.*, p.p_name FROM order_details od JOIN products p ON od.product_id = p.id WHERE od.order_id = '$order_id'";
 $result = $conn->query($query);
 ?>
 <!DOCTYPE html>
@@ -50,101 +67,18 @@ $result = $conn->query($query);
             box-shadow: 0px 10px 15px rgba(0, 0, 0, 0.1);
         }
 
-        .invoice-header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
         .invoice-header h4 {
             font-weight: bold;
             color: #4caf50;
         }
 
-        .invoice-header p {
-            color: #555;
-        }
-
-        .invoice-details {
-            margin-top: 20px;
-        }
-
-        .invoice-details .row {
-            margin-bottom: 15px;
-        }
-
-        .invoice-details .col-md-6 {
-            font-size: 16px;
-            color: #333;
-        }
-
-        .invoice-details .col-md-6 strong {
-            color: #4caf50;
-        }
-
-        .invoice-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-
-        .invoice-table th,
-        .invoice-table td {
-            text-align: left;
+        .invoice-table th, .invoice-table td {
             padding: 12px;
             border-bottom: 1px solid #eee;
         }
 
-        .invoice-table th {
-            background-color: #4caf50;
-            color: white;
-        }
-
-        .invoice-table td {
-            font-size: 16px;
-            color: #555;
-        }
-
-        .total-section {
-            margin-top: 30px;
-            display: flex;
-            justify-content: space-between;
-            font-size: 18px;
-            font-weight: bold;
-            color: #333;
-        }
-
         .total-section .total-price {
             color: #4caf50;
-        }
-
-        .invoice-footer {
-            text-align: center;
-            margin-top: 40px;
-        }
-
-        .invoice-footer .btn-print {
-            background-color: #4caf50;
-            color: white;
-            padding: 12px 30px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-        .invoice-footer .btn-print:hover {
-            background-color: #45a049;
-        }
-
-        .btn-back {
-            background-color: #f44336;
-            color: white;
-            padding: 10px 20px;
-            text-decoration: none;
-            border-radius: 5px;
-        }
-
-        .btn-back:hover {
-            background-color: #d32f2f;
         }
     </style>
 </head>
@@ -159,18 +93,9 @@ $result = $conn->query($query);
     </div>
 
     <div class="invoice-details">
-        <div class="row">
-            <div class="col-md-6">
-                <p><strong>Address:</strong> <?php echo $address; ?></p>
-                <p><strong>Email:</strong> <?php echo $email; ?></p>
-                <p><strong>Phone:</strong> <?php echo $phone; ?></p>
-                <p><strong>Payment:</strong> COD</p>
-            </div>
-            <div class="col-md-6 text-right">
-                <p><strong>Shipping Method:</strong> Standard Delivery</p>
-                <p><strong>Payment Status:</strong> unPaid</p>
-            </div>
-        </div>
+        <p><strong>Address:</strong> <?php echo $address; ?></p>
+        <p><strong>Email:</strong> <?php echo $email; ?></p>
+        <p><strong>Phone:</strong> <?php echo $phone; ?></p>
     </div>
 
     <table class="invoice-table">
@@ -218,5 +143,4 @@ $result = $conn->query($query);
 </div>
 
 </body>
-
 </html>

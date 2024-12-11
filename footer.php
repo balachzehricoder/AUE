@@ -44,6 +44,6 @@
                 </div>
             </div>
         </div>
-        <p class="text-center text-sm text-gray-400 mt-8">&copy; Bootshop</p>
+        <p class="text-center text-sm text-gray-400 mt-8">&copy; design with huaifawebdeveloper and developed by wswebsolution.com</p>
     </div>
 </div>

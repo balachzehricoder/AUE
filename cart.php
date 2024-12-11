@@ -1,9 +1,10 @@
 <?php
+error_reporting(0);
 session_start();
-include 'admin/confiq.php';
-include 'navandside.php';
+include 'admin/confiq.php'; // Include your database connection
+include 'navandside.php'; // Navigation and sidebar
 
-// Check if the cart is empty.
+// Check if the cart is empty
 if (empty($_SESSION['cart'])) {
     echo '<div class="text-center text-xl font-bold text-red-600">Your Cart Is Empty.</div>';
     echo '<br>';
@@ -12,48 +13,89 @@ if (empty($_SESSION['cart'])) {
 }
 
 $cart = $_SESSION['cart'];
-
 $insert = false;
 if (isset($_POST['submit'])) {
     $user_id = $_SESSION["user_id"];
     $total = $_SESSION['cart_details']['cart_total_price'];
-    $delivery_charges = 200;
+    $delivery_charges = 200; // Delivery charge
     $order_date_time = date('Y-m-d H:i:s');
 
+    // Check database connection
     if (!$conn) {
         die("Connection failed: " . mysqli_connect_errno());
     }
 
-    $sql = "INSERT INTO ORDERS (user_id, total, delivery_charges, order_date_time) VALUES ('$user_id', '$total', '$delivery_charges', '$order_date_time')";
+    // Insert order data into the ORDERS table
+    $sql = "INSERT INTO ORDERS (user_id, total, delivery_charges, order_date_time) 
+            VALUES ('$user_id', '$total', '$delivery_charges', '$order_date_time')";
 
     if ($conn->query($sql) === TRUE) {
         $order_id = mysqli_insert_id($conn);
 
+        // Calculate total points for the order
+        $total_points = 0;
         foreach ($cart as $product_id => $product) {
             $price = $product['price'];
             $qty = $product['quantity'];
+            $product_points = $product['points']; // Get points from the product data
+            $total_points += $product_points * $qty;
 
-            $sql = "INSERT INTO order_details (order_id, product_id, price, qty) VALUES ('$order_id', '$product_id', '$price', '$qty')";
+            $sql = "INSERT INTO order_details (order_id, product_id, price, qty) 
+                    VALUES ('$order_id', '$product_id', '$price', '$qty')";
             if ($conn->query($sql) === TRUE) {
                 $insert = true;
-                $_SESSION['cart'] = [];
             } else {
                 echo "Error: $sql <br>" . $conn->error;
             }
         }
 
-        $insert = true;
-        $_SESSION['cart'] = null;
-        $_SESSION['cart_details'] = null;
+        // Update user points
+        $current_points_query = "SELECT points FROM users WHERE id = '$user_id'"; // Get current points of user
+        $result = $conn->query($current_points_query);
+        $current_points = 0;
 
+        if ($result->num_rows > 0) {
+            $row = $result->fetch_assoc();
+            $current_points = $row['points'];
+        }
+
+        // Update the user's points with the new points earned from this order
+        $new_points = $current_points + $total_points;
+        $update_points_query = "UPDATE users SET points = '$new_points' WHERE id = '$user_id'";
+
+        if ($conn->query($update_points_query) === TRUE) {
+            echo "Points updated successfully.";
+        } else {
+            echo "Error updating points: " . $conn->error;
+        }
+
+        // Commission calculation
+        $commission_percentage = 0.1; // 10% commission of total points
+        $commission = $total_points * $commission_percentage;
+
+        // Insert or update commission for the month
+        $month = date('m');
+        $year = date('Y');
+        $commission_sql = "INSERT INTO commissions (user_id, month, year, total_commission) 
+                           VALUES ('$user_id', '$month', '$year', '$commission')
+                           ON DUPLICATE KEY UPDATE total_commission = total_commission + '$commission'";
+        $conn->query($commission_sql);
+
+        // Send email after successful order
         include 'Email/email.php';
 
+        // Clear the cart from session after order is placed
+        unset($_SESSION['cart']);
+        unset($_SESSION['cart_details']);
+
+        // Redirect to invoice page
         header("Location: invoice.php?order_id=" . $order_id);
         exit;
     } else {
         echo "Error: $sql <br>" . $conn->error;
     }
 
+    // Close the database connection
     $conn->close();
 }
 ?>
@@ -160,4 +202,4 @@ if (isset($_POST['submit'])) {
 
 </body>
 </html>
-<?php include 'footer.php'?>
+<?php include 'footer.php' ?>
