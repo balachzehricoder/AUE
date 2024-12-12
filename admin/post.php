@@ -57,7 +57,6 @@ if ($category_id) {
                                 <tr>
                                     <th>Product Name</th>
                                     <th>Price</th>
-                                    <th>Best Price</th>
                                     <th>Quantity</th>
                                     <th>Tax</th>
                                     <th>Points</th>
@@ -85,7 +84,6 @@ if ($category_id) {
                                         echo "<tr>
                                                     <td>" . htmlspecialchars($product['p_name']) . "</td>
                                                     <td>" . htmlspecialchars($product['p_price']) . "</td>
-                                                    <td>" . htmlspecialchars($product['bp']) . "</td>
                                                     <td>" . htmlspecialchars($product['p_qty']) . "</td>
                                                     <td>" . htmlspecialchars($product['p_tax']) . "%</td>
                                                     <td>" . htmlspecialchars($product['points']) . "</td>
@@ -109,7 +107,6 @@ if ($category_id) {
                                 <tr>
                                     <th>Product Name</th>
                                     <th>Price</th>
-                                    <th>Best Price</th>
                                     <th>Quantity</th>
                                     <th>Tax</th>
                                     <th>Points</th>
@@ -186,8 +183,8 @@ $conn->close();
                                 <label for="product-points" class="col-form-label">Points <span class="text-danger">*</span></label>
                                 <input type="number" class="form-control" id="product-points" name="product_points" placeholder="Enter product points..." required>
 
-                                <label for="product-bp" class="col-form-label">BP <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="product-bp" name="product_bp" placeholder="Enter BP value..." required>
+                                <!-- <label for="product-bp" class="col-form-label">BP <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="product-bp" name="product_bp" placeholder="Enter BP value..." required> -->
 
                                 <label for="product-image" class="col-form-label">Product Image <span class="text-danger">*</span></label>
                                 <div class="input-group mb-3">

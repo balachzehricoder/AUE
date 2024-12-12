@@ -44,7 +44,7 @@ try {
     $mail->SMTPSecure = 'tls';
     $mail->Port = 587;
 
-    $mail->setFrom('phonesell7896@gmail.com', "phonesell.com");
+    $mail->setFrom('phonesell7896@gmail.com', "AUE");
     $mail->addAddress($email, $full_name); // User's email
     $mail->Subject = 'Your Order Confirmation';
     $mail->Body = 'Hello ' . $full_name . ', your order has been placed successfully!';

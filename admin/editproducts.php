@@ -41,10 +41,10 @@ $category_result = $conn->query($category_query);
                                 <input type="text" name="p_price" id="p_price" class="form-control" value="<?= htmlspecialchars($product['p_price']) ?>" required>
                             </div>
 
-                            <div class="form-group">
+                            <!-- <div class="form-group">
                                 <label for="bp">Best Price</label>
-                                <input type="text" name="bp" id="bp" class="form-control" value="<?= htmlspecialchars($product['bp']) ?>" required>
-                            </div>
+                                 <input type="text" name="bp" id="bp" class="form-control" value="" required> -->
+                            <!-- </div>  -->
 
                             <div class="form-group">
                                 <label for="p_qty">Quantity</label>

@@ -14,7 +14,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     // Image upload handling
     $upload_dir = "uploads/products/";
-    $img_upload = '';
+    $img_upload = $_POST['old_img_upload']; // Default to the old image
 
     if (!empty($_FILES['img_upload']['name'])) {
         // Sanitize file name
@@ -35,19 +35,26 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             echo "Error uploading file.";
             exit;
         }
-    } else {
-        // Keep the old image if no new image is uploaded
-        $img_upload = $_POST['old_img_upload'];
     }
 
-    // Update the product in the database
-    $stmt = $conn->prepare("
-        UPDATE products 
-        SET p_name = ?, p_price = ?, bp = ?, p_qty = ?, p_tax = ?, points = ?, category_id = ?, img_upload = ? 
-        WHERE id = ?
-    ");
-    $stmt->bind_param("ssdiisssi", $p_name, $p_price, $bp, $p_qty, $p_tax, $points, $category_id, $img_upload, $product_id);
+    // Prepare the SQL query
+    if (!empty($img_upload)) {
+        $stmt = $conn->prepare("
+            UPDATE products 
+            SET p_name = ?, p_price = ?, bp = ?, p_qty = ?, p_tax = ?, points = ?, category_id = ?, img_upload = ? 
+            WHERE id = ?
+        ");
+        $stmt->bind_param("ssdiisssi", $p_name, $p_price, $bp, $p_qty, $p_tax, $points, $category_id, $img_upload, $product_id);
+    } else {
+        $stmt = $conn->prepare("
+            UPDATE products 
+            SET p_name = ?, p_price = ?, bp = ?, p_qty = ?, p_tax = ?, points = ?, category_id = ? 
+            WHERE id = ?
+        ");
+        $stmt->bind_param("ssdiissi", $p_name, $p_price, $bp, $p_qty, $p_tax, $points, $category_id, $product_id);
+    }
 
+    // Execute the statement
     if ($stmt->execute()) {
         header("Location: post.php");
     } else {
