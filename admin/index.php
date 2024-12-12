@@ -2,28 +2,13 @@
 
 
 
-// session_start(); // Start the session
+session_start();
+if (!isset($_SESSION['admin_logged_in'])) {
+    header('Location: login.php');
+    exit();
+}
 
-// // Check if session for user role is set
-// if (isset($_SESSION['role'])) {
-//     $role = $_SESSION['role'];
 
-//     // Display content based on the role
-//     if ($role === 'Super Admin') {
-//         // echo "Welcome, Super Admin!";
-//         // Display Super Admin-specific content
-//     } elseif ($role === 'Admin') {
-//         // echo "Welcome, Admin!";
-//         // Display Admin-specific content
-//     } else {
-//         echo "Welcome, Editor!";
-//         // Display Editor-specific content
-//     }
-// } else {
-//     // Redirect to login if session is not set
-//     header("Location: ../admin_signin");
-//     exit(); // Stop further execution
-// }
 
 
 
