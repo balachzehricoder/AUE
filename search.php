@@ -75,7 +75,6 @@ function searchProducts($search_query)
                     <p class="text-lg text-gray-600 mb-4">Rs <?php echo number_format($product["p_price"]); ?></p>
 
                     <!-- Display BP and Points -->
-                    <p class="text-md text-blue-500 mb-2">Bonus Points: <?php echo number_format($product["bp"]); ?></p>
                     <p class="text-md text-yellow-500 mb-4">Points: <?php echo number_format($product["points"]); ?></p>
 
                     <div class="flex justify-between">

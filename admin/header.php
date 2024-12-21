@@ -1,3 +1,10 @@
+<?php 
+
+include 'session.php'
+
+
+
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -9,9 +16,9 @@
     <!-- theme meta -->
     <meta name="theme-name" content="quixlab" />
 
-    <title>Quixlab - Bootstrap Admin Dashboard Template by Themefisher.com</title>
+    <title>quixmasteradmin - Admin Of AUE</title>
     <!-- Favicon icon -->
-    <link rel="icon" type="image/png" sizes="16x16" href="images/favicon.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="logo.jpg">
     <!-- Pignose Calender -->
     <link href="./plugins/pg-calendar/css/pignose.calendar.min.css" rel="stylesheet">
     <!-- Chartist -->
@@ -40,13 +47,13 @@
     <!--*******************
         Preloader start
     ********************-->
-    <div id="preloader">
+    <!-- <div id="preloader">
         <div class="loader">
             <svg class="circular" viewBox="25 25 50 50">
                 <circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="3" stroke-miterlimit="10" />
             </svg>
         </div>
-    </div>
+    </div> -->
     <!--*******************
         Preloader end
   -->
@@ -61,10 +68,10 @@
         <div class="nav-header">
             <div class="brand-logo">
                 <a href="index.php">
-                    <b class="logo-abbr"><img src="images/header_logo.png" alt=""> </b>
-                    <span class="logo-compact"><img src="images/header_logo.png" alt=""></span>
+                    <b class="logo-abbr"><img src="logo.jpg" alt=""> </b>
+                    <span class="logo-compact"><img src="logo.jpg" alt=""></span>
                     <span class="brand-title">
-                        <img src="images/header_logo.png" alt="" height="50px" >
+                        <img src="logo.jpg" alt="" height="50px" width="50%" >
                     </span>
                 </a>
             </div>
@@ -219,7 +226,6 @@
                                 <div class="dropdown-content-body">
                                     <ul>
                                         <li><a href="javascript:void()">English</a></li>
-                                        <li><a href="javascript:void()">spanish</a></li>
                                     </ul>
                                 </div>
                             </div>

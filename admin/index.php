@@ -2,33 +2,9 @@
 
 
 
-session_start();
-if (!isset($_SESSION['admin_logged_in'])) {
-    header('Location: login.php');
-    exit();
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-include 'confiq.php'; 
 include 'header.php';
+include 'confiq.php'; 
+
 include 'sidebar.php';
 ?>
 <div class="content-body">

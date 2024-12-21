@@ -3,8 +3,13 @@
         ***********************************-->
 
 
+<!-- <?php 
+
+include 'session.php'
 
 
+
+?> -->
 
 
         <div class="nk-sidebar">
@@ -35,13 +40,7 @@
                         </ul>
                     </li>
  
-                    <?php
-// Assuming the session has already started and the role is set in $_SESSION['role']
-$role = isset($_SESSION['role']) ? $_SESSION['role'] : '';
-
-// Check if the user is not Admin or Editor, and show the "User" menu if they are not
-if ($role !== 'Admin' && $role !== 'Editor') {
-?>
+                   
     <li class="mega-menu mega-menu-sm">
         <a class="has-arrow" href="javascript:void()" aria-expanded="false">
             <i class="icon-globe-alt menu-icon"></i><span class="nav-text">Categories management</span>
@@ -50,9 +49,26 @@ if ($role !== 'Admin' && $role !== 'Editor') {
             <li><a href="catigory.php">All Categories</a></li>
         </ul>
     </li>
-<?php
-}
-?>
+
+    <li class="mega-menu mega-menu-sm">
+                        <a class="has-arrow" href="javascript:void()" aria-expanded="false">
+                            <i class="icon-globe-alt menu-icon"></i><span class="nav-text">Site Settings</span>
+                        </a>
+                        <ul aria-expanded="false">
+                            <a href="settings.php">settings</a>
+                        </ul>
+                    </li>
+
+
+
+                    <!-- <li class="mega-menu mega-menu-sm">
+                        <a class="has-arrow" href="javascript:void()" aria-expanded="false">
+                            <i class="icon-globe-alt menu-icon"></i><span class="nav-text">add reviews</span>
+                        </a>
+                        <ul aria-expanded="false">
+                            <a href="users.php">reviews</a>
+                        </ul>
+                    </li> -->
 
 
                     <li class="mega-menu mega-menu-sm">

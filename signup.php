@@ -72,10 +72,7 @@ if (isset($_POST["register"])) {
 
     if ($stmt->execute()) {
         // Update sponsor's group_points after registration
-        if ($sponsor_id != "") {
-            $update_sponsor = "UPDATE users SET group_points = group_points + 1 WHERE unique_id = '$sponsor_id'";
-            mysqli_query($conn, $update_sponsor);
-        }
+      
         
         // Send the Unique ID and Email to User
         $mail = new PHPMailer(true);

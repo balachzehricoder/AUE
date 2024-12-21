@@ -1,22 +1,20 @@
 <?php
 include 'confiq.php';
- include 'header.php';
- include 'sidebar.php';
-?>
+include 'header.php';
+include 'sidebar.php';
 
-<?php
 // Handle role filter
 $role = isset($_GET['role']) ? $_GET['role'] : null;
 
 // Fetch users based on selected role
 if ($role) {
-    $stmt = $conn->prepare("SELECT id, full_name, email, phone, address, role, referral_id, sponsor_id, personal_points, group_points, points FROM users WHERE role = ? ORDER BY full_name ASC");
+    $stmt = $conn->prepare("SELECT * FROM users WHERE role = ? ORDER BY first_name ASC");
     $stmt->bind_param("s", $role);
     $stmt->execute();
     $user_result = $stmt->get_result();
     $stmt->close();
 } else {
-    $user_query = "SELECT id, full_name, email, phone, address, role, referral_id, sponsor_id, personal_points, group_points, points  FROM users ORDER BY full_name ASC";
+    $user_query = "SELECT * FROM users ORDER BY first_name ASC";
     $user_result = $conn->query($user_query);
 }
 ?>
@@ -59,57 +57,88 @@ if ($role) {
                         <div class="table-responsive">
                             <table class="table table-striped table-bordered zero-configuration">
                                 <thead>
-                                <tr>
-                                    <th>Full Name</th>
-                                    <th>Email</th>
-                                    <th>Phone</th>
-                                    <th>Address</th>
-                                    <th>Role</th>
-                                    <th>Referral ID</th>
-                                    <th>Sponsor ID</th>
-                                    <th>Personal Points</th>
-                                    <th>Group Points</th>
-                                    <th>Total Points</th>
-                                </tr>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>First Name</th>
+                                        <th>Last Name</th>
+                                        <th>Email</th>
+                                        <th>CNIC</th>
+                                        <th>Date of Birth</th>
+                                        <th>Address</th>
+                                        <th>Mobile Number</th>
+                                        <th>Optional Mobile</th>
+                                        <th>Sponsor ID</th>
+                                        <th>Points</th>
+                                        <th>Group Points</th>
+                                        <th>Commission</th>
+                                        <th>Created At</th>
+                                        <th>Profile Picture</th>
+                                        <th>ID Card Picture</th>
+                                        <th>Actions</th>
+                                    </tr>
                                 </thead>
                                 <tbody>
                                 <?php
                                 if ($user_result->num_rows > 0) {
                                     while ($user = $user_result->fetch_assoc()) {
-                                        // Format the created_at field
+                                        // Handle image URLs
+                                        $profileImage = str_replace("admin/", "", $user['profile_pic']);
+                                        $idCardImage = str_replace("admin/", "", $user['id_card_picture']);
 
                                         echo "<tr>
-                                                    <td>" . htmlspecialchars($user['full_name']) . "</td>
-                                                    <td>" . htmlspecialchars($user['email']) . "</td>
-                                                    <td>" . htmlspecialchars($user['phone']) . "</td>
-                                                    <td>" . htmlspecialchars($user['address']) . "</td>
-                                                    <td>" . htmlspecialchars($user['role']) . "</td>
-                                                    <td>" . htmlspecialchars($user['referral_id']) . "</td>
-                                                    <td>" . htmlspecialchars($user['sponsor_id']) . "</td>
-                                                    <td>" . htmlspecialchars($user['personal_points']) . "</td>
-                                                    <td>" . htmlspecialchars($user['group_points']) . "</td>
-                                                    <td>" . htmlspecialchars($user['points']) . "</td>
-                                                    
-                                                </tr>";
+                                            <td>" . htmlspecialchars($user['id']) . "</td>
+                                            <td>" . htmlspecialchars($user['first_name']) . "</td>
+                                            <td>" . htmlspecialchars($user['last_name']) . "</td>
+                                            <td>" . htmlspecialchars($user['email']) . "</td>
+                                            <td>" . htmlspecialchars($user['cnic']) . "</td>
+                                            <td>" . htmlspecialchars($user['dob']) . "</td>
+                                            <td>" . htmlspecialchars($user['address']) . "</td>
+                                            <td>" . htmlspecialchars($user['mobile_number']) . "</td>
+                                            <td>" . htmlspecialchars($user['optional_mobile_number']) . "</td>
+                                            <td>" . htmlspecialchars($user['sponsor_id']) . "</td>
+                                            <td>" . htmlspecialchars($user['points']) . "</td>
+                                            <td>" . htmlspecialchars($user['group_points']) . "</td>
+                                            <td>" . htmlspecialchars($user['commission']) . "</td>
+                                            <td>" . htmlspecialchars($user['created_at']) . "</td>
+                                            <td><img src='" . htmlspecialchars($profileImage) . "' alt='Profile Pic' width='50' height='50'></td>
+                                            <td><img src='" . htmlspecialchars($idCardImage) . "' alt='ID Card' width='50' height='50'></td>
+                                           <td>
+    <!-- Form for deleting a user -->
+    <form method='get' action='delete_user.php' style='display:inline;' onsubmit='return confirm('Are you sure you want to delete this user?');'>
+        <!-- Hidden input for user_id, which will be passed in the URL -->
+        <input type='hidden' name='user_id' value='<?php echo htmlspecialchars($user[id]); ?>'>
+        <!-- Submit button to delete the user -->
+        <button type='submit' class='btn btn-danger btn-sm'>Delete</button>
+    </form>
+</td>
+
+                                        </tr>";
                                     }
                                 } else {
-                                    echo "<tr><td colspan='12'>No users found</td></tr>";
+                                    echo "<tr><td colspan='17'>No users found</td></tr>";
                                 }
                                 ?>
                                 </tbody>
                                 <tfoot>
-                                <tr>
-                                    <th>Full Name</th>
-                                    <th>Email</th>
-                                    <th>Phone</th>
-                                    <th>Address</th>
-                                    <th>Role</th>
-                                    <th>Referral ID</th>
-                                    <th>Sponsor ID</th>
-                                    <th>Personal Points</th>
-                                    <th>Group Points</th>
-                                    <th>Total Points</th>
-                                </tr>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>First Name</th>
+                                        <th>Last Name</th>
+                                        <th>Email</th>
+                                        <th>CNIC</th>
+                                        <th>Date of Birth</th>
+                                        <th>Address</th>
+                                        <th>Mobile Number</th>
+                                        <th>Optional Mobile</th>
+                                        <th>Sponsor ID</th>
+                                        <th>Points</th>
+                                        <th>Group Points</th>
+                                        <th>Commission</th>
+                                        <th>Created At</th>
+                                        <th>Profile Picture</th>
+                                        <th>ID Card Picture</th>
+                                        <th>Actions</th>
+                                    </tr>
                                 </tfoot>
                             </table>
                         </div>

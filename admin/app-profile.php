@@ -5,6 +5,16 @@ include 'sidebar.php';
 
 session_start(); // Start the session
 
+// Check if the user is logged in, if not redirect to login page
+if (!isset($_SESSION['admin_username'])) {
+    // Redirect to login page or show a login form
+    echo "<script>
+            alert('You need to be logged in to access this page.');
+            window.location.href = 'login.php'; // Replace with your actual login page
+          </script>";
+    exit(); // Stop further code execution
+}
+
 // Assuming you fetch the logged-in user's details from the database
 $user_id = $_SESSION['admin_username'];
 $query = "SELECT ADMIN_NAME, ADMIN_EMAILID FROM admin WHERE ADMINid = ?";
@@ -93,4 +103,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 <?php 
 include 'footer.php'; 
-?>
+?>   

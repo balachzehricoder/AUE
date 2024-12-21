@@ -42,26 +42,24 @@ $isLoggedIn = isset($_SESSION['user_id']); // Check if a user session exists
 
             <!-- Nav Links (Desktop) -->
             <div class="hidden md:flex space-x-6">
-                <a href="#" class="hover:text-gray-700">Home</a>
-                <a href="#" class="hover:text-gray-700">Shop</a>
-                <a href="#" class="hover:text-gray-700">Category</a>
-                <a href="#" class="hover:text-gray-700">Contact Us</a>
+                <a href="index.php" class="hover:text-gray-700 text-black ">Home</a>
+                <a href="shop.php" class="hover:text-gray-700 text-black">Shop</a>
+                <a href="contactus.php" class="hover:text-gray-700 text-black">Contact Us</a>
             </div>
 
             <!-- Auth/User Links -->
             <div class="hidden md:flex items-center space-x-6">
                 <?php if ($isLoggedIn): ?>
                     <!-- User is logged in -->
-                    <a href="userpanel/pages/dashboard.html" class="hover:text-gray-700">Profile</a>
-                    <a href="wishlistview.php" class="hover:text-gray-700">Wishlist</a>
-                    <a href="cart.php" class="hover:text-gray-700">Cart</a>
-                    <a href="logout.php" class="hover:text-gray-700">Logout</a>
+                    <a href="userpanel/pages/dashboard.php" class="hover:text-gray-700 text-black">Profile</a>
+                    <a href="wishlistview.php" class="hover:text-gray-700 text-black">Wishlist</a>
+                    <a href="cart.php" class="hover:text-gray-700 text-black">Cart</a>
+                    <a href="logout.php" class="hover:text-gray-700 text-black">Logout</a>
                 <?php else: ?>
                     <!-- User is not logged in -->
-                    <a href="login.php" class="hover:text-gray-700">Sign In</a>
-                    <a href="register.php" class="hover:text-gray-700">Sign Up</a>
-                    <a href="wishlistview.php" class="hover:text-gray-700">Wishlist</a>
-                    <a href="cart.php" class="hover:text-gray-700">Cart</a>
+                    <a href="login.php" class="hover:text-gray-700 text-black">Sign In</a>
+                    <a href="register.php" class="hover:text-gray-700 text-black">Sign Up</a>
+                    <a href="cart.php" class="hover:text-gray-700 text-black">Cart</a>
                 <?php endif; ?>
             </div>
 
@@ -77,22 +75,20 @@ $isLoggedIn = isset($_SESSION['user_id']); // Check if a user session exists
 
         <!-- Mobile Menu -->
         <div id="mobile-menu" class="hidden md:hidden">
-            <a href="#" class="block py-2 px-4 text-sm hover:bg-gray-300">Home</a>
-            <a href="#" class="block py-2 px-4 text-sm hover:bg-gray-300">Shop</a>
-            <a href="#" class="block py-2 px-4 text-sm hover:bg-gray-300">Category</a>
-            <a href="#" class="block py-2 px-4 text-sm hover:bg-gray-300">Contact Us</a>
+            <a href="index.php" class="block py-2 px-4 text-sm hover:bg-gray-300 text-black">Home</a>
+            <a href="shop.php" class="block py-2 px-4 text-sm hover:bg-gray-300 text-black">Shop</a>
+            <a href="contact.php" class="block py-2 px-4 text-sm hover:bg-gray-300 text-black">Contact Us</a>
             <?php if ($isLoggedIn): ?>
                 <!-- User is logged in -->
-                <a href="userpanel/pages/dashboard.html" class="block py-2 px-4 text-sm hover:bg-gray-300">Profile</a>
-                <a href="wishlist.php" class="block py-2 px-4 text-sm hover:bg-gray-300">Wishlist</a>
-                <a href="cart.php" class="block py-2 px-4 text-sm hover:bg-gray-300">Cart</a>
-                <a href="logout.php" class="block py-2 px-4 text-sm hover:bg-gray-300">Logout</a>
+                <a href="userpanel/pages/dashboard.html" class="block py-2 px-4 text-sm hover:bg-gray-300 text-black">Profile</a>
+                <a href="wishlist.php" class="block py-2 px-4 text-sm hover:bg-gray-300 text-black">Wishlist</a>
+                <a href="cart.php" class="block py-2 px-4 text-sm hover:bg-gray-300 text-black">Cart</a>
+                <a href="logout.php" class="block py-2 px-4 text-sm hover:bg-gray-300 text-black">Logout</a>
             <?php else: ?>
                 <!-- User is not logged in -->
-                <a href="login.php" class="block py-2 px-4 text-sm hover:bg-gray-300">Sign In</a>
-                <a href="register.php" class="block py-2 px-4 text-sm hover:bg-gray-300">Sign Up</a>
-                <a href="wishlist.php" class="block py-2 px-4 text-sm hover:bg-gray-300">Wishlist</a>
-                <a href="cart.php" class="block py-2 px-4 text-sm hover:bg-gray-300">Cart</a>
+                <a href="login.php" class="block py-2 px-4 text-sm hover:bg-gray-300 text-black">Sign In</a>
+                <a href="register.php" class="block py-2 px-4 text-sm hover:bg-gray-300 text-black">Sign Up</a>
+                <a href="cart.php" class="block py-2 px-4 text-sm hover:bg-gray-300 text-black">Cart</a>
             <?php endif; ?>
         </div>
     </div>

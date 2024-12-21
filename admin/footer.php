@@ -1,6 +1,6 @@
 <div class="footer">
             <div class="copyright">
-                <p>Copyright &copy; Designed & Developed by <a href="https://wswebsolution.com/">simple solutions</a> 2024</p>
+                <p>Copyright &copy; Designed & Developed by <a href="https://wswebsolution.com/">Wswebsolution</a> 2024</p>
             </div>
         </div>
         <!--**********************************

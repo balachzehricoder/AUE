@@ -35,7 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $mail->setFrom('phonesell7896@gmail.com', 'AUE');
         $mail->addAddress($user_email);
         $mail->Subject = "Order Delivered";
-        $mail->Body = "Your order number $order_id has been delivered.";
+        $mail->Body = "Your order number  has been delivered.";
 
         $mail->send();
         header("Location: orders.php");

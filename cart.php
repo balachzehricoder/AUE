@@ -1,10 +1,10 @@
 <?php
-error_reporting(0);
+error_reporting(E_ALL); // Enable full error reporting for debugging
 session_start();
+
 include 'admin/confiq.php'; // Include your database connection
 include 'navandside.php'; // Navigation and sidebar
 
-// Check if the cart is empty
 if (empty($_SESSION['cart'])) {
     echo '<div class="text-center text-xl font-bold text-red-600">Your Cart Is Empty.</div>';
     echo '<br>';
@@ -14,13 +14,13 @@ if (empty($_SESSION['cart'])) {
 
 $cart = $_SESSION['cart'];
 $insert = false;
+
 if (isset($_POST['submit'])) {
     $user_id = $_SESSION["user_id"];
     $total = $_SESSION['cart_details']['cart_total_price'];
     $delivery_charges = 200; // Delivery charge
     $order_date_time = date('Y-m-d H:i:s');
 
-    // Check database connection
     if (!$conn) {
         die("Connection failed: " . mysqli_connect_errno());
     }
@@ -32,12 +32,12 @@ if (isset($_POST['submit'])) {
     if ($conn->query($sql) === TRUE) {
         $order_id = mysqli_insert_id($conn);
 
-        // Calculate total points for the order
+        // Calculate total points for the order (Personal points for the user)
         $total_points = 0;
         foreach ($cart as $product_id => $product) {
             $price = $product['price'];
             $qty = $product['quantity'];
-            $product_points = $product['points']; // Get points from the product data
+            $product_points = $product['points'];
             $total_points += $product_points * $qty;
 
             $sql = "INSERT INTO order_details (order_id, product_id, price, qty) 
@@ -49,8 +49,8 @@ if (isset($_POST['submit'])) {
             }
         }
 
-        // Update user points
-        $current_points_query = "SELECT points FROM users WHERE id = '$user_id'"; // Get current points of user
+        // Update user's personal points
+        $current_points_query = "SELECT points FROM users WHERE id = '$user_id'";
         $result = $conn->query($current_points_query);
         $current_points = 0;
 
@@ -64,41 +64,52 @@ if (isset($_POST['submit'])) {
         $update_points_query = "UPDATE users SET points = '$new_points' WHERE id = '$user_id'";
 
         if ($conn->query($update_points_query) === TRUE) {
-            echo "Points updated successfully.";
+            echo "User's personal points updated successfully.";
         } else {
-            echo "Error updating points: " . $conn->error;
+            echo "Error updating user's points: " . $conn->error;
         }
 
-        // Commission calculation
-        $commission_percentage = 0.1; // 10% commission of total points
-        $commission = $total_points * $commission_percentage;
+        // Fetch the sponsor_id of the logged-in user
+        $sponsor_query = "SELECT sponsor_id FROM users WHERE id = '$user_id'";
+        $sponsor_result = $conn->query($sponsor_query);
+        
+        if ($sponsor_result->num_rows > 0) {
+            $sponsor_row = $sponsor_result->fetch_assoc();
+            $sponsor_id = $sponsor_row['sponsor_id'];
 
-        // Insert or update commission for the month
-        $month = date('m');
-        $year = date('Y');
-        $commission_sql = "INSERT INTO commissions (user_id, month, year, total_commission) 
-                           VALUES ('$user_id', '$month', '$year', '$commission')
-                           ON DUPLICATE KEY UPDATE total_commission = total_commission + '$commission'";
-        $conn->query($commission_sql);
+            if (!empty($sponsor_id)) {
+                // Update the sponsor's group_points by adding a percentage of the cart total points
+                $sponsor_percentage = 0.10; // Example: sponsor gets 10% of the user's total points
+                $sponsor_points = $total_points * $sponsor_percentage;
 
-        // Send email after successful order
-        include 'Email/email.php';
+                // Update the sponsor's group_points
+                $update_sponsor_points = "UPDATE users SET group_points = group_points + $sponsor_points WHERE id = '$sponsor_id'";
 
-        // Clear the cart from session after order is placed
+                if ($conn->query($update_sponsor_points) === TRUE) {
+                    echo "Sponsor's group points updated successfully.";
+                } else {
+                    echo "Error updating sponsor points: " . $conn->error;
+                }
+            }
+        }
+
+        include 'Email/email.php'; // Send email after successful order
+
         unset($_SESSION['cart']);
         unset($_SESSION['cart_details']);
 
-        // Redirect to invoice page
         header("Location: invoice.php?order_id=" . $order_id);
         exit;
     } else {
         echo "Error: $sql <br>" . $conn->error;
     }
 
-    // Close the database connection
     $conn->close();
 }
 ?>
+
+
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -172,7 +183,6 @@ if (isset($_POST['submit'])) {
                     ?>
                     <tr class="border-b">
                         <td class="px-6 py-4"><img width="60" src="admin/<?php echo $product['image']; ?>" alt=""/></td>
-                        <td class="px-6 py-4"><?php echo $product['name']; ?><br/>Color: Black, Material: Metal</td>
                         <td class="px-6 py-4">
                             <div class="flex items-center">
                                 <input class="w-16 text-center" type="number" value="<?php echo $product['quantity']; ?>" readonly />
@@ -194,12 +204,28 @@ if (isset($_POST['submit'])) {
     </div>
 
     <div class="mt-6 text-center">
-        <form action="" method="POST">
-            <button type="submit" name="submit" class="bg-green-500 text-white px-6 py-2 rounded-lg">Proceed to Checkout</button>
-        </form>
-    </div>
+    <?php
+$isLoggedIn = isset($_SESSION['user_id']); // Check if the user is logged in
+?>
+
+<form action="" method="POST">
+    <button 
+        type="submit" 
+        name="submit" 
+        class="px-6 py-2 rounded-lg 
+            <?php echo $isLoggedIn ? 'bg-green-500 text-white hover:bg-green-600' : 'bg-gray-400 text-gray-600 cursor-not-allowed'; ?>" 
+        <?php echo !$isLoggedIn ? 'disabled' : ''; ?>
+    >
+        Proceed to Checkout
+    </button>
+</form>
+
+<?php if (!$isLoggedIn): ?>
+    <p class="mt-2 text-red-600">You need to log in to proceed with checkout.</p>
+<?php endif; ?>
+</div>
+
 </div>
 
 </body>
 </html>
-<?php include 'footer.php' ?>

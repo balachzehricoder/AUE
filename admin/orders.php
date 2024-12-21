@@ -111,6 +111,11 @@ while ($order = $order_result->fetch_assoc()) {
                                                         Mark as Delivered
                                                     </button>
                                                 </form>
+                                                <td>
+                                                    
+    <button class="btn btn-primary" data-toggle="modal" data-target="#trackingModal<?= $order['order_id'] ?>">Add Tracking Number</button>
+</td>
+
                                             </td>
                                         </tr>
                                     <?php endforeach; ?>
@@ -131,3 +136,30 @@ while ($order = $order_result->fetch_assoc()) {
 $conn->close();
 include 'footer.php';
 ?>
+
+
+<!-- Modal for Adding Tracking Number -->
+<div class="modal fade" id="trackingModal<?= $order['order_id'] ?>" tabindex="-1" role="dialog" aria-labelledby="trackingModalLabel<?= $order['order_id'] ?>" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="trackingModalLabel<?= $order['order_id'] ?>">Add Tracking Number</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form method="POST" action="update_tracking.php">
+                    <input type="hidden" name="order_id" value="<?= htmlspecialchars($order['order_id']) ?>">
+                    <input type="hidden" name="user_email" value="<?= htmlspecialchars($user_data['email']) ?>">
+                    <div class="form-group">
+                        <label for="tracking_number">Tracking Number</label>
+                        <input type="text" name="tracking_number" class="form-control" id="tracking_number" placeholder="Enter Tracking Number" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Save Tracking Number</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
