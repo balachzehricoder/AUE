@@ -10,6 +10,8 @@ if (isset($_POST["login"])) {
     $result = mysqli_query($conn, $query);
     if (mysqli_num_rows($result) == 0) {
         echo "<script>alert('No user found with this ID');</script>";
+        echo "<script>window.location.href = 'login.php';</script>";
+
         exit();
     }
 

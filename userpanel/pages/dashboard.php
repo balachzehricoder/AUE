@@ -68,16 +68,18 @@ if (!isset($_SESSION['daily_group_points'])) {
 }
 
 // Fetch User Level based on total points
-// Fetch User Level based on total points
-$query_level = "SELECT l.level_name 
-                FROM users u 
-                LEFT JOIN levels l ON u.level = l.id 
-                WHERE u.id = '$user_id'";
+$query_level = "SELECT l.level_name, u.level FROM users u LEFT JOIN levels l ON u.level = l.id WHERE u.id = '$user_id'";
 $result_level = mysqli_query($conn, $query_level);
 
 if ($result_level) {
     $row_level = mysqli_fetch_assoc($result_level);
-    $user_level = $row_level['level_name'] ?? 'Not Assigned';
+    
+    // Check if the level is 1 (Bronze)
+    if ($row_level['level'] == 1) {
+        $user_level = 'Bronze';
+    } else {
+        $user_level = $row_level['level_name'] ?? 'Not Assigned';
+    }
 } else {
     $user_level = 'Not Assigned';
 }

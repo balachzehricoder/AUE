@@ -1,9 +1,9 @@
 <?php
-error_reporting(E_ALL); // Enable full error reporting for debugging
+error_reporting(E_ALL);
 session_start();
 
-include 'admin/confiq.php'; // Include your database connection
-include 'navandside.php'; // Navigation and sidebar
+include 'admin/confiq.php';
+include 'navandside.php';
 
 if (empty($_SESSION['cart'])) {
     echo '<div class="text-center text-xl font-bold text-red-600">Your Cart Is Empty.</div>';
@@ -18,7 +18,7 @@ $insert = false;
 if (isset($_POST['submit'])) {
     $user_id = $_SESSION["user_id"];
     $total = $_SESSION['cart_details']['cart_total_price'];
-    $delivery_charges = 200; // Delivery charge
+    $delivery_charges = 200; 
     $order_date_time = date('Y-m-d H:i:s');
 
     if (!$conn) {
@@ -32,7 +32,7 @@ if (isset($_POST['submit'])) {
     if ($conn->query($sql) === TRUE) {
         $order_id = mysqli_insert_id($conn);
 
-        // Calculate total points for the order (Personal points for the user)
+        // Calculate total points for the order
         $total_points = 0;
         foreach ($cart as $product_id => $product) {
             $price = $product['price'];
@@ -49,49 +49,104 @@ if (isset($_POST['submit'])) {
             }
         }
 
-        // Update user's personal points
-        $current_points_query = "SELECT points FROM users WHERE id = '$user_id'";
-        $result = $conn->query($current_points_query);
-        $current_points = 0;
+        // Update user's personal points and monthly points
+        $user_query = "SELECT points, monthly_points FROM users WHERE id = '$user_id'";
+        $result = $conn->query($user_query);
+        $current_points = $current_monthly_points = 0;
 
         if ($result->num_rows > 0) {
             $row = $result->fetch_assoc();
             $current_points = $row['points'];
+            $current_monthly_points = $row['monthly_points'];
         }
 
-        // Update the user's points with the new points earned from this order
         $new_points = $current_points + $total_points;
-        $update_points_query = "UPDATE users SET points = '$new_points' WHERE id = '$user_id'";
+        $new_monthly_points = $current_monthly_points + $total_points;
 
-        if ($conn->query($update_points_query) === TRUE) {
-            echo "User's personal points updated successfully.";
+        $update_user_points_query = "UPDATE users SET points = '$new_points', monthly_points = '$new_monthly_points' WHERE id = '$user_id'";
+        if ($conn->query($update_user_points_query) === TRUE) {
+            echo "User's personal and monthly points updated successfully.";
         } else {
             echo "Error updating user's points: " . $conn->error;
         }
 
-        // Fetch the sponsor_id of the logged-in user
-        $sponsor_query = "SELECT sponsor_id FROM users WHERE id = '$user_id'";
-        $sponsor_result = $conn->query($sponsor_query);
+        // Fetch the sponsor's unique ID based on the user's sponsor_id
         
-        if ($sponsor_result->num_rows > 0) {
-            $sponsor_row = $sponsor_result->fetch_assoc();
-            $sponsor_id = $sponsor_row['sponsor_id'];
-
-            if (!empty($sponsor_id)) {
-                // Update the sponsor's group_points by adding a percentage of the cart total points
-                $sponsor_percentage = 0.10; // Example: sponsor gets 10% of the user's total points
-                $sponsor_points = $total_points * $sponsor_percentage;
-
-                // Update the sponsor's group_points
-                $update_sponsor_points = "UPDATE users SET group_points = group_points + $sponsor_points WHERE id = '$sponsor_id'";
-
-                if ($conn->query($update_sponsor_points) === TRUE) {
-                    echo "Sponsor's group points updated successfully.";
+        // Fetch the sponsor's ID from the logged-in user's data
+        // Maximum levels for downline propagation
+        $max_levels = 5; 
+        $current_level = 1;
+        
+        // Commission chart for group points, income, and bonus
+        $commission_chart = [
+            1 => ['group_points' => 100, 'income' => 800, 'bonus' => 200],
+            2 => ['group_points' => 200, 'income' => 1750, 'bonus' => 200],
+            3 => ['group_points' => 300, 'income' => 3000, 'bonus' => 500],
+            4 => ['group_points' => 400, 'income' => 4200, 'bonus' => 500],
+            5 => ['group_points' => 500, 'income' => 6000, 'bonus' => 1000],
+            6 => ['group_points' => 600, 'income' => 9500, 'bonus' => 1000],
+            7 => ['group_points' => 700, 'income' => 11000, 'bonus' => 1500],
+            8 => ['group_points' => 800, 'income' => 13000, 'bonus' => 1500],
+            9 => ['group_points' => 900, 'income' => 15000, 'bonus' => 5000],
+            10 => ['group_points' => 1000, 'income' => 17000, 'bonus' => 5000],
+        ];
+        
+        // Fetch the first sponsor ID (direct sponsor)
+        $sponsor_id_query = "SELECT sponsor_id FROM users WHERE id = '$user_id'";
+        $sponsor_id_result = $conn->query($sponsor_id_query);
+        
+        if ($sponsor_id_result->num_rows > 0) {
+            $sponsor_id_row = $sponsor_id_result->fetch_assoc();
+            $current_sponsor_id = $sponsor_id_row['sponsor_id'];
+        
+            while (!empty($current_sponsor_id) && $current_level <= $max_levels) {
+                // Find the sponsor's user record by unique_id
+                $sponsor_query = "SELECT id, unique_id, sponsor_id, level, group_points FROM users WHERE unique_id = '$current_sponsor_id'";
+                $sponsor_result = $conn->query($sponsor_query);
+        
+                if ($sponsor_result->num_rows > 0) {
+                    $sponsor_row = $sponsor_result->fetch_assoc();
+                    $sponsor_user_id = $sponsor_row['id']; // Sponsor's user ID
+                    $next_sponsor_id = $sponsor_row['sponsor_id']; // Next sponsor in the chain
+                    $current_sponsor_level = $sponsor_row['level']; // Current sponsor level
+                    $current_group_points = $sponsor_row['group_points']; // Sponsor's current group points
+        
+                    // Get the group points, income, and bonus based on the sponsor's level
+                    $group_points = isset($commission_chart[$current_sponsor_level]) ? $commission_chart[$current_sponsor_level]['group_points'] : 0;
+                    $income = isset($commission_chart[$current_sponsor_level]) ? $commission_chart[$current_sponsor_level]['income'] : 0;
+                    $bonus = isset($commission_chart[$current_sponsor_level]) ? $commission_chart[$current_sponsor_level]['bonus'] : 0;
+        
+                    // Calculate the new group points (accumulating with previous points)
+                    $new_group_points = $current_group_points + $group_points;
+        
+                    // Update sponsor's group points, level, income, and bonus dynamically
+                    $update_sponsor_query = "UPDATE users 
+                                             SET group_points = '$new_group_points',
+                                                 income = income + '$income',
+                                                 bonus = bonus + '$bonus',
+                                                 level = '$current_level'
+                                             WHERE id = '$sponsor_user_id'";
+        
+                    if ($conn->query($update_sponsor_query) === TRUE) {
+                        echo "Level $current_level sponsor (User ID: $sponsor_user_id) updated with $group_points group points.<br>";
+                    } else {
+                        echo "Error updating Level $current_level sponsor: " . $conn->error;
+                    }
+        
+                    // Move to the next sponsor in the chain and increment the level
+                    $current_sponsor_id = $next_sponsor_id;
+                    $current_level++; // Increment the level for the next sponsor
                 } else {
-                    echo "Error updating sponsor points: " . $conn->error;
+                    echo "Sponsor with unique_id $current_sponsor_id not found.<br>";
+                    break; // Stop propagation if no sponsor found
                 }
             }
+        } else {
+            echo "No direct sponsor found for the logged-in user.";
         }
+        
+        
+        
 
         include 'Email/email.php'; // Send email after successful order
 
@@ -107,6 +162,8 @@ if (isset($_POST['submit'])) {
     $conn->close();
 }
 ?>
+
+
 
 
 
